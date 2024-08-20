@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>專業低碳管理方案流程圖及對應表格</title>
+    <style>
+        /* Style the flowchart area */
+        #flowchart {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            overflow-x: auto; /* Allow horizontal scrolling on small screens */
+        }
+        /* Style the table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        /* Node and link styles */
+        .node text {
+            font: 14px sans-serif;
+        }
+        .link {
+            fill: none;
+            stroke: #666;
+            stroke-width: 2px;
+            marker-end: url(#arrow); /* Use the defined marker */
+        }
+        .arrowHead {
+            fill: #666;
+        }
+        .highlight {
+            background-color: #ffe4c4; /* Highlight color for table rows */
+        }
+        .link-text {
+            font: 12px sans-serif;
+            text-anchor: middle;
+            fill: #333;
+        }
+
+        /* Media query for mobile devices */
+        @media (max-width: 768px) {
+            #flowchart svg {
+                width: 100%; /* Make SVG fill the width of the container */
+                height: auto; /* Adjust height automatically */
+            }
+            .link-text {
+                font-size: 10px; /* Adjust font size for smaller screens */
+            }
+            .node text {
+                font-size: 12px; /* Adjust node text size */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="flowchart">
+        <svg viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid meet">
+            <!-- SVG content will be dynamically filled -->
+        </svg>
+    </div>
+    <table id="details">
+        <thead>
+            <tr>
+                <th>步驟</th>
+                <th>描述</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Table content will be dynamically filled -->
+        </tbody>
+    </table>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const data = [
+                {id: "政策規劃", desc: "制定低碳管理的核心策略和具體目標。", color: "#ff7f0e", shape: "rect", x: 100, y: 100},
+                {id: "能源效率", desc: "提升能源利用效率，減少能源浪費。", color: "#2ca02c", shape: "ellipse", x: 400, y: 100},
+                {id: "可再生能源", desc: "推動可再生能源的使用，降低化石燃料依賴。", color: "#1f77b4", shape: "diamond", x: 700, y: 100},
+                {id: "排放監測", desc: "實施碳排放監測，確保達到降低碳排放的目標。", color: "#d62728", shape: "circle", x: 1000, y: 100},
+                {id: "持續改進", desc: "根據監測結果持續優化策略，改進管理措施。", color: "#9467bd", shape: "rect", x: 1000, y: 400},
+                {id: "教育培訓", desc: "提供教育與培訓，提升員工與公眾的環保意識。", color: "#8c564b", shape: "ellipse", x: 700, y: 400},
+                {id: "監督評估", desc: "定期評估執行成效與政策影響。", color: "#e377c2", shape: "diamond", x: 400, y: 400},
+                {id: "社會參與", desc: "鼓勵社會各界參與並提供意見反饋。", color: "#7f7f7f", shape: "circle", x: 100, y: 400}
+            ];
+
+            const svg = d3.select("#flowchart svg");
+
+            svg.append("defs").append("marker")
+                .attr("id", "arrow")
+                .attr("viewBox", "0 -5 10 10")
+                .attr("refX", 10)  // Adjusted to move arrow slightly away from text
+                .attr("refY", 0)
+                .attr("markerWidth", 6)
+                .attr("markerHeight", 6)
+                .attr("orient", "auto")
+                .append("path")
+                .attr("d", "M0,-5L10,0L0,5")
+                .style("fill", "#666");
+
+            const nodeGroup = svg.selectAll("g.node")
+                .data(data)
+                .enter()
+                .append("g")
+                .attr("class", "node")
+                .attr("transform", d => `translate(${d.x}, ${d.y})`)
+                .on("click", function(event, d) {
+                    document.getElementById(d.id).scrollIntoView({behavior: 'smooth', block: 'center'});
+                    highlightRow(d);
+                });
+
+            nodeGroup.each(function(d) {
+                const node = d3.select(this);
+                if (d.shape === "rect") {
+                    node.append("rect")
+                        .attr("x", -50)
+                        .attr("y", -30)
+                        .attr("width", 100)
+                        .attr("height", 60)
+                        .style("fill", d.color);
+                } else if (d.shape === "ellipse") {
+                    node.append("ellipse")
+                        .attr("rx", 60)
+                        .attr("ry", 30)
+                        .style("fill", d.color);
+                } else if (d.shape === "diamond") {
+                    node.append("polygon")
+                        .attr("points", "0,-50 50,0 0,50 -50,0")
+                        .style("fill", d.color);
+                } else if (d.shape === "circle") {
+                    node.append("circle")
+                        .attr("r", 50)
+                        .style("fill", d.color);
+                }
+            });
+
+            nodeGroup.append("text")
+                .attr("y", 5)
+                .attr("text-anchor", "middle")
+                .text(d => d.id);
+
+            // Draw links
+            const links = data.slice(1).map((d, i) => ({source: data[i], target: data[(i + 1) % data.length]}));
+            const linkTexts = [
+                "UDM ESG 政策", // Text for the first arrow
+                "提升效率",      // Text for the second arrow
+                "推動可再生能源", // Text for the third arrow
+                "監測排放",      // Text for the fourth arrow
+                "持續改進",      // Text for the fifth arrow
+                "教育培訓",      // Text for the sixth arrow
+                "監督與評估"      // Text for the seventh arrow
+            ];
+
+            const linkElements = svg.selectAll(".link")
+                .data(links)
+                .enter().append("g");
+
+            linkElements.append("path")
+                .attr("class", "link")
+                .attr("d", d => {
+                    const dx = d.target.x - d.source.x, dy = d.target.y - d.source.y,
+                          dr = Math.sqrt(dx * dx + dy * dy);
+                    return `M${d.source.x + 60}, ${d.source.y}A${dr},${dr} 0 0,1 ${d.target.x - 60},${d.target.y}`;
+                })
+                .attr("marker-end", "url(#arrow)");
+
+            linkElements.each(function(d, i) {
+                const midX = (d.source.x + d.target.x) / 2;
+                const midY = (d.source.y + d.target.y) / 2;
+
+                d3.select(this).append("text")
+                    .attr("class", "link-text")
+                    .attr("x", midX)
+                    .attr("y", midY + 20)  // Placed below the path
+                    .attr("dy", ".35em")
+                    .attr("text-anchor", "middle")
+                    .text(linkTexts[i]);  // Custom text for each arrow
+            });
+
+            const tbody = d3.select("#details tbody");
+            const rows = tbody.selectAll("tr")
+                .data(data)
+                .enter()
+                .append("tr")
+                .attr("id", d => d.id)
+                .on("click", function(_, d) { highlightRow(d); });
+
+            rows.append("td").text(d => d.id);
+            rows.append("td").text(d => d.desc);
+
+            function highlightRow(selectedData) {
+                rows.classed("highlight", d => d === selectedData);
+            }
+        });
+    </script>
+</body>
+</html>
